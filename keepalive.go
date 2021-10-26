@@ -210,7 +210,7 @@ func (wac *Conn) sendAdminTest() error {
 		return err
 	case <-time.After(wac.msgTimeout):
 		wac.CountTimeout()
-		if wac.ws.keepAliveErrorCount > 0 {
+		if wac.ws != nil && wac.ws.keepAliveErrorCount > 0 {
 			return ErrWebsocketKeepaliveFailed
 		}
 		return ErrConnectionTimeout
