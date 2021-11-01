@@ -261,6 +261,10 @@ Loop:
 	wac.session = &session
 	wac.loggedIn = true
 
+	wac.ws.Add(2)
+	go wac.readPump(wac.ws)
+	go wac.keepAlive(wac.ws, 21000, 30000)
+
 	return session, info.WID, nil
 }
 
