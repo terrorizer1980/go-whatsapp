@@ -123,6 +123,14 @@ func (wac *Conn) Login(qrChan chan<- string, ctx context.Context) (Session, JID,
 		return session, "", ErrAlreadyLoggedIn
 	}
 
+	// listener for Login response
+	// it's important that this exists before we start connecting,
+	// otherwise the regular message handler can beat us to the login response
+	// and ruin the login flow
+	s1 := make(chan string, 1)
+	wac.listener.add(s1, nil, false, "s1")
+
+
 	if err := wac.connect(); err != nil && err != ErrAlreadyConnected {
 		return session, "", err
 	}
@@ -144,10 +152,6 @@ func (wac *Conn) Login(qrChan chan<- string, ctx context.Context) (Session, JID,
 	if err != nil {
 		return session, "", fmt.Errorf("error generating keys: %w", err)
 	}
-
-	//listener for Login response
-	s1 := make(chan string, 1)
-	wac.listener.add(s1, nil, false, "s1")
 
 	ref, ttl, err := wac.adminInitRequest(session.ClientID)
 	if err != nil {
