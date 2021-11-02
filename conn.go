@@ -202,10 +202,6 @@ func (wac *Conn) connect() (err error) {
 		wac.listener.onReconnect()
 	}
 
-	ws.Add(2)
-	go wac.readPump(ws)
-	go wac.keepAlive(ws, 21000, 30000)
-
 	wac.loggedIn = false
 	wac.adminInited = false
 	wac.log.Debugln("Successfully connected to websocket")
