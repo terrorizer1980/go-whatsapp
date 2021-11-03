@@ -157,6 +157,16 @@ func (wac *Conn) Login(qrChan chan<- string, ctx context.Context) (Session, JID,
 
 	wac.loginSessionLock.Lock()
 	defer wac.loginSessionLock.Unlock()
+
+	defer func() {
+		if !wac.loggedIn {
+			// looks like we errored out somewhere along the way.
+			// close the connection to make sure nothing arrives later
+			// and confuses the message handlers
+			wac.Disconnect()
+		}
+	}()
+
 	if ctx == nil {
 		ctx = context.Background()
 	}
